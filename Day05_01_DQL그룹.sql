@@ -1,0 +1,64 @@
+-- group by
+
+SELECT NVL(DEPARTMENT_ID, 0)
+  FROM EMPLOYEES
+ GROUP BY DEPARTMENT_ID;
+
+-- 1. 동일한 DEPARTMENT_ID를 그룹화하여 조회하시오
+SELECT DEPARTMENT_ID
+  FROM EMPLOYEES
+ GROUP BY DEPARTMENT_ID;
+ 
+ --2. 동일한 DEPARTMENT_ID로 그룹화하여 FIRST_NAME과 DEPARTMENT_ID를 조회하시오 (실패하는 쿼리문)
+SELECT FIRST_NAME, DEPARTMENT_ID
+ FROM EMPLOYEES
+GROUP BY DEPARTMENT_ID;
+
+--3. GROUP BY 절이 없는 집계함수는 전체 데이터를 대상으로 한다
+SELECT 
+        COUNT(*) AS 전체사원수
+      , SUM(SALARY) AS 전체사원연봉합
+      , AVG(SALARY) AS 전체사원연봉평균
+      , MAX(SALARY) AS 전체사원연봉킹
+      , MIN(SALARY) AS 전체사원연봉최하위
+  FROM  EMPLOYEES;
+  
+  
+-- 4. GROUP BY 절을 지정하면 
+SELECT
+        DEPARTMENT_ID
+      , COUNT(*) AS 부서별사원수
+      , SUM(SALARY) AS 부서별연봉합
+      , AVG(SALARY) AS 부서별연봉평균
+      , MAX(SALARY) AS 부서별연봉킹
+      , MAX(SALARY) AS 부서별연봉최하위
+  FROM  
+        EMPLOYEES
+ WHERE
+        DEPARTMENT_ID IS NOT NULL
+ GROUP BY 
+        DEPARTMENT_ID;
+
+-- 5. DEPARMENT_ID NULL인 부서를 제외하고, 모든 부서의 부서별 사원수를 조회하시오
+SELECT DEPARTMENT_ID,
+       COUNT(*) AS 부서별사원수
+  FROM EMPLOYEES
+ WHERE DEPARTMENT_ID IS NOT NULL
+ GROUP BY DEPARTMENT_ID;
+ 
+ 
+-- 6. 부서별 인원수가 다섯명 이하인 부서를 조회
+SELECT DEPARTMENT_ID,
+       COUNT(*) AS 부서별인원수
+  FROM EMPLOYEES
+ GROUP BY DEPARTMENT_ID
+HAVING COUNT(*) <= 5;
+
+-- 참고 GROUP BY 없이 집계함수 사용하기
+SELECT DISTINCT DEPARTMENT_ID,
+       COUNT(*) OVER(PARTITION BY DEPARTMENT_ID) AS 부서별사원수,
+       SUM(SALARY) OVER(PARTITION BY DEPARTMENT_ID) AS 부서별연봉합,
+       AVG(SALARY) OVER(PARTITION BY DEPARTMENT_ID) AS 부서별연봉평균,
+       MAX(SALARY) OVER(PARTITION BY DEPARTMENT_ID) AS 부서별연봉킹,
+       MIN(SALARY) OVER(PARTITION BY DEPARTMENT_ID) AS 부서별연봉최하위
+  FROM EMPLOYEES;
